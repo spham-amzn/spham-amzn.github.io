@@ -1,0 +1,41 @@
+theme = "hugo-theme-m10c"
+baseURL = 'https://example.org/'
+languageCode = 'en-us'
+title = "Steve's Blog"
+
+[pagination]
+  pagerSize = 8
+
+[menu]
+  [[menu.main]]
+    identifier = "home"
+    name = "Home"
+    url = "/"
+    weight = 1
+  [[menu.main]]
+    identifier = "tags"
+    name = "Tags"
+    url = "/tags/"
+    weight = 2
+
+[params]
+  author = "Steve Pham"
+  description = "Welcome to my blog. This is a place to discuss all things related to 3D Engines."
+  menu_item_separator = " - "
+  avatar = 'images/spham-amzn.png'
+
+  [[params.social]]
+    icon = "brand-github"
+    name = "Github"
+    url = "https://github.com/spham-amzn"
+  [[params.social]]
+    icon = "brand-linkedin"
+    name = "Linked-In"
+    url = "https://www.linkedin.com/in/steve-pham-69a7142/"
+
+[params.style]
+   darkestColor = "#202020"
+   darkColor = "#404040"
+   lightColor = "#c0c0c0"
+   lightestColor = "#fff"
+   primaryColor = "#a0a0e0"
