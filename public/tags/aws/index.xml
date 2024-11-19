@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>AWS on Steve&#39;s Blog</title>
+    <link>http://localhost:1313/tags/aws/</link>
+    <description>Recent content in AWS on Steve&#39;s Blog</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 18 Nov 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/aws/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Running robotic simulations in the cloud with Amazon EC2</title>
+      <link>http://localhost:1313/posts/o3de-ros2-aws-mp-ami/</link>
+      <pubDate>Mon, 18 Nov 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/o3de-ros2-aws-mp-ami/</guid>
+      <description>&lt;h1 id=&#34;robotic-development-challenges&#34;&gt;Robotic development challenges&lt;/h1&gt;&#xA;&lt;p&gt;Developing robots is often difficult, expensive, and time consuming. Developing and running test scenarios in the real world tend to be slow, limited, and cost-prohibitive. Using simulations to build and conduct tests allows robotic developers the freedom to construct virtually any test environment, and the tests are not constrained by the number of robots available for testing. The use of simulation software can help address these issues. Robots can be simulated in a virtual world and tests can be run in a controlled environment repeatedly. However, being able to provide more realistic simulations depends on the capabilities of the software and the hardware. Simulators that provide realistic real-time image rendering and physics often require more expensive hardware. Being able to build and deploy simulations on the cloud means that you can build and run them on demand and only pay by usage, without the need for the initial capital expense. Other advantages like scaling, maintenance, and support come into play as well.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
