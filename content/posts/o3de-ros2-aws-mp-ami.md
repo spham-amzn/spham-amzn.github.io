@@ -22,7 +22,7 @@ In this tutorial, we will create a robotic simulation that demonstrates a simple
 
 ### ROS
 
-[ROS](https://docs.ros.org/en/humble/index.html) is a set of libraries and tools for building robot applications. It is currently on version 2, and the instructions in this tutorial will be using this version.
+[ROS](https://docs.ros.org/en/humble/index.html) is a set of libraries and tools for building robot applications. From drivers to state-of-the-art algorithms, and with powerful developer tools, ROS has what you need for your next robotics project. And it's all open source. Full project details on [ROS.org](https://docs.ros.org/en/humble/index.html)
 
 ### O3DE
 
