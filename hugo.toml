@@ -1,7 +1,7 @@
 theme = "hugo-theme-m10c"
 baseURL = 'https://example.org/'
 languageCode = 'en-us'
-title = "Steve's Blog"
+title = "Steve's O3DE Blog"
 
 [pagination]
   pagerSize = 8
@@ -20,7 +20,7 @@ title = "Steve's Blog"
 
 [params]
   author = "Steve Pham"
-  description = "Welcome to my blog. This is a place to discuss all things related to 3D Engines."
+  description = "Welcome to my blog. This is a place to discuss all things related to O3DE."
   menu_item_separator = " - "
   avatar = 'images/spham-amzn.png'
 
