@@ -15,37 +15,38 @@ tags = [
 
 
 # Distributing Simulation Projects
-For robotics simulation projects for ROS2 and O3DE, collaboration on constructing and refining the simulation can be shared across a team through source control such as GIT or Perforce. However, in order iterate through developing the simulation, O3DE, ROS2, and its environment and dependencies need to be installed separately in order to access and contribute to the project. I explained how Amazon's EC2 helps with the environment through a marketplace AMI in my previous blog post. 
+For robotics simulation projects using [ROS2](https://ros.org/) and [O3DE](https://o3de.org), collaboration on constructing and refining the simulation can be shared across a team through source control such as GIT or Perforce. However, in order to access, develop, and contribute to the simulation project, O3DE, ROS2, and its environment and dependencies need to be installed separately. I explained how Amazon's EC2 helps with the environment through a marketplace AMI in my previous [blog post](https://spham-amzn.github.io/posts/o3de-ros2-aws-mp-ami/). 
 
-The primary goal of simulations is for training robots through ROS2, not through O3DE. Once the simulation is ready for use, O3DE itself is not needed to run the simulation. The simulation project can be exported into a launcher application separate from O3DE's Editor and build environment. Exporting a simulation project into its own launcher will package just the launcher executable and its bare minimum dependent binaries, assets, and necessary settings needed to launch the simulation. All the additional Editor and Asset Processor related artifacts that comes with a full O3DE installation will be omitted.
+The primary goal of simulations is for training robots through ROS2, not through O3DE’s Editor. Once the simulation is ready for use, O3DE itself is not needed to run the simulation. The simulation project can be exported into a launcher application separate from O3DE's Editor and build environment. Exporting a simulation project into its own launcher will package just the launcher executable and its bare minimum dependent binaries, assets, and necessary settings needed to launch the simulation. All the additional Editor and Asset Processor related artifacts that comes with a full O3DE installation is omitted.
 
 ### Containerization
 
-The exported project alone usually is not enough to have it run on different machines. Along with the base operating system (in this case, Ubuntu Linux) there are additional pre-requisite package requirements. In order to have the simulation project run consistently across different machines, each machine must have the same operating system, packages, and environment. Another approach to utilize containerization. 
+The exported project alone usually is not enough to have it run on different machines. Along with the base operating system (in this case, Ubuntu Linux) there are additional pre-requisite package requirements. In order to have the simulation project run consistently across different machines, each machine must have the same operating system, packages, and environment. Another approach is to utilize containerization.
 
 Containerization provides many benefits for our use case:
 
 #### Portability
-The simulation project will be contained in its own isolated environment and operating system. The specific operating system, Ubuntu 22.04, and all of its required packages will be embedded in the container image and isolated from the host machine. That means no additional simulation-specific pre-requisites are needed to launch the simulation. This allows it to run on multiple devices and operating systems.
+The simulation project will be contained in its own isolated environment and operating system. The specific operating system, Ubuntu 22.04, and all of its required packages will be embedded in the container image and isolated from the host machine. That means no additional simulation-specific prerequisites are needed to launch the simulation (other than the Container service and the NVIDIA Container Toolkit). This allows it to run on multiple devices and operating systems.
 
 #### Consistency
 Container images are immutable. This ensures that the application will run in a consistent manner across any environment or operating system.
 
 #### Scalability
-Containers are lightweight and run efficiently. Unlike virtual machines, they do not need to be boot up to load the operating system. Containers can be distributed and managed easily through different container orchestration tools as well. 
-
-We will be using the same simulation project we created from my previous blog in this example.
+Containers are lightweight and run efficiently. Unlike virtual machines, they do not need to boot up to load the operating system. Containers can be easily distributed and managed through container orchestration tools as well. 
 
 ## Exporting the Project
-Once the simulation project is working as expected through the Editor and from command line, we can use the O3DE to export the project to a single folder. Through the Project Manager, click on the context button for the project **MyRobotSimulation** and click on **Open Export Settings...**
+Once the simulation project is working as expected through the Editor and from command line, we can use O3DE to export the project to a single folder. Open Project Manager, click on the context button for the project **MyRobotSimulation** and click on **Open Export Settings...**
+
+
 
 ![O3DE Project Manager](/images/blog/o3de-ros2-export-project/project-manager-context.png)
 
-This will bring up the export settings specific to this project. This is where we will configure the settings we need to export just the simulation (game) launcher.
+This brings up the export settings specific to this project. Next, we configure the settings needed to export just the simulation (game) launcher. 
+
 
 ![Export Setting](/images/blog/o3de-ros2-export-project/export_settings.png)
 
-The export settings is designed for any type of project, not just simulations. There will only be a few settings that we need to enable and configure for our simulation launcher:
+The export settings is designed for any type of project, not just simulations. There’s only a few settings needed to create our simulation launcher: 
 
 |  |  | |
 | ----- | ----- | ----- |
@@ -62,18 +63,22 @@ The export settings is designed for any type of project, not just simulations. T
 
 Once the configuration is set, click on **Save** to save the settings. To run the project export, click on the context menu button for the project again, and click on **Export Launcher**->**Linux**
 
+
 ![Export Linux](/images/blog/o3de-ros2-export-project/export-launcher-linux.png)
 
-When the process is complete, the exported project will be located in folder named **MyRobotSimulationGamePackage** in the path **~/O3DE/Projects/MyRobotSimulation/build/export/**
+When the process is complete, the exported project will be located in a folder named **MyRobotSimulationGamePackage** in the path **~/O3DE/Projects/MyRobotSimulation/build/export/**
 
 # Creating a Docker Image
-The exported project can now be stored into a compressed archive and distributed to other Ubuntu 22.04 hosts to use. However, in order to run the project successfully, they must conform to the same general requirements for O3DE and ROS2. This means that the runtime environment must closely match the same environment as O3DE (minus the build tools). Another approach to distribution is to use containerization. Containers gives us a portable and consistent mechanism to distribute and execute our simulation across different machines and environments. 
+ The exported project can now be stored into a compressed archive and distributed to other Ubuntu 22.04 hosts to use. However, in order to run the project successfully, they must conform to the same general requirements for O3DE and ROS2. This means that the runtime environment must closely match the same environment as O3DE (minus the build tools). For this project to be portable and easy to distribute, we will use Containerization.
 
-For this blog, we will use [Docker](https://www.docker.com/) and the [NVIDIA Container toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker). 
+
+For this blog, we will use [Docker](https://www.docker.com/) for the Containerization platform in conjunction with the [NVIDIA Container toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker). 
 
 ### Installing Docker Engine
 
-Install Docker Engine for Ubuntu using the [Docker Installation instructions](https://docs.docker.com/engine/install/ubuntu/). The following is a quick cheat-sheet to install Docker Engine using the **apt** repository based on the [Dockers's apt instructions](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository).
+Install Docker Engine for Ubuntu using the Docker installation instructions. The following is a quick cheat-sheet to install Docker Engine using the apt repository based onDocker’s apt instructions. 
+
+Install Docker Engine for Ubuntu using the [Docker Installation instructions](https://docs.docker.com/engine/install/ubuntu/). The following is a quick cheat-sheet to install Docker Engine using the **apt** repository based on the [Docker's apt instructions](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository).
 
 #### 1. Set up Docker's **apt** repository
 ```bash
@@ -96,7 +101,7 @@ sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
 
-#### 3. Create a **docker** group (if not already created) Add the current user to the **docker** group
+#### 3. Create a **docker** group (if not already created). Add the current user to the **docker** group
 ```bash
 sudo groupadd docker
 
@@ -105,7 +110,7 @@ sudo usermod -aG docker $USER
 newgrp docker
 ```
 
-#### 4. Verify that you can run docker without sudo by running the hello-world image.
+#### 4. Verify that you can run Docker without sudo by running the hello-world image.
 
 ```bash
 docker run hello-world
@@ -143,7 +148,7 @@ sudo nvidia-ctk config --set nvidia-container-cli.no-cgroups --in-place
 
 ### Create the Docker Image
 
-A **Dockerfile** is the recipe for the docker engine to build a Docker Image. The Docker Image will include the minimal required packages for O3DE launchers and ROS2, based on the type of simulation that **MyRobotSimulation** was built for. Docker uses a path to refer to as its context root, and in our example, we will use the path to the exported project from earlier (**~/O3DE/Projects/MyRobotSimulation/build/export/**). 
+A **Dockerfile** is the recipe for the Docker engine to build a Docker Image. The Docker Image will include the minimal required packages for O3DE launchers and ROS2, based on the type of simulation that **MyRobotSimulation** was built for. Docker uses a path to refer to as its context root, and in our example, we will use the path to the exported project from earlier (**~/O3DE/Projects/MyRobotSimulation/build/export/**). 
 
 
 #### 1. Create a Dockerfile
@@ -197,8 +202,8 @@ ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 
 ```
 
-#### 2. Build the docker image
-Once the Dockerfile recipe is saved, you can use the Docker Engine to build an OCI-compliant container image. We will name the image **my_robot_simulation** (Docker is case sensitive and does not allow for mixed casing in the name) and use the **latest** tag for our sample.
+#### 2. Build the Docker image
+Once the Dockerfile recipe is saved, you can use the Docker Engine to build an OCI-compliant container image. Name the image **my_robot_simulation** (Docker is case sensitive and does not allow for mixed casing in the name) and use the **latest** tag for our sample.
 
 Use the following command to build the image.
 
@@ -206,8 +211,8 @@ Use the following command to build the image.
 docker build -t my_robot_simulation:latest ~/O3DE/Projects/MyRobotSimulation/build/export
 ```
 
-#### 3. Test the docker image locally
-Before uploading and distributing the Docker Image, we will test it locally by running in through Docker Engine and using the NVIDIA Container Toolkit. 
+#### 3. Test the Docker Image locally
+Before uploading and distributing the Docker Image, test it locally by running in through Docker Engine and using the NVIDIA Container Toolkit. 
 
 In order for the image to have access to the local display, you need to add it to xhost.
 ```bash
@@ -221,7 +226,7 @@ To launch the simulation through Docker, run the following command
 docker run --rm --network="bridge" --gpus all -e DISPLAY=:1 -v /tmp/.X11-unix:/tmp/.X11-unix -it my_robot_simulation:latest /data/workspace/Simulation/MyRobotSimulation.GameLauncher
 ```
 
-While the simulation is running from the Docker Image, you can now connect to it through ROS2 using the sample navigation example from the MyRobotSimulation project (as described in the previous blog). Open up a new terminal and enter the following lines.
+While the simulation is running from the Docker Image, you can now connect to it through ROS2 using the sample navigation example from the MyRobotSimulation project (as described in the previous [blog](https://spham-amzn.github.io/posts/o3de-ros2-aws-mp-ami/)). Open up a new terminal and enter the following lines.
 
 ```bash
 cd ~/O3DE/Projects/MyRobotSimulation/Examples
@@ -231,11 +236,11 @@ ros2 launch slam_navigation/launch/navigation.launch.py
 
 
 ## Publish the Docker Image
-Docker images do not upload to a repository the same way as regular files or archives do. Instead, they rely on OCI-Compliant container registries. For this example, we will use [Amazon Elastic Container Registry](https://aws.amazon.com/ecr/) to upload and distribute our Docker image. 
+Docker Images do not upload to a repository the same way as regular files or archives do. Instead, they rely on OCI-Compliant container registries. For this example, we will use [Amazon Elastic Container Registry (ECR)](https://aws.amazon.com/ecr/) to upload and distribute our Docker image. 
 
 >**Note**: As with the AWS EC2 instance from the previously blog, we will be using the same Amazon account login for ECR
 
-Before starting, make sure that you have the [AWS CLI](https://aws.amazon.com/cli/) installed
+Before starting, make sure that you have the [AWS CLI](https://aws.amazon.com/cli/) installed using the following command:
 ```
 sudo apt  install awscli
 ```
@@ -270,7 +275,7 @@ You should get a response similar to the following:
     }
 }
 ```
-Note the `repositoryUri` value and set it to an environment variable for convenience
+Note the `repositoryUri` value and set it to an environment variable for convenience, for example:
 ```bash
 export ECR_SIMULATION_URI=000000000000.dkr.ecr.us-west-2.amazonaws.com/my_robot_simulation
 ```
@@ -305,9 +310,9 @@ You will need to authenticate to the AWS account where the Image has been upload
 
 #### 1. Set the Repository URI and log into AWS
 
-For convenience, set an environment variable to the URI. 
+For convenience, set an environment variable to the URI for the Docker Image.
 ```bash
-export ECR_SIMULATION_URI=857350499302.dkr.ecr.us-west-2.amazonaws.com/my_robot_simulation
+export ECR_SIMULATION_URI=000000000000.dkr.ecr.us-west-2.amazonaws.com/my_robot_simulation
 ```
 
 Once logged into your AWS account using the same `aws configure` steps above, you can pull the Docker Image based on the repository URI.
@@ -317,7 +322,7 @@ Then get the login password for your ECR and send it to the docker login
 aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_SIMULATION_URI
 ```
 
-#### 2. Pull the docker image
+#### 2. Pull the Docker Image
 Pull the Docker Image from ECR to the local Docker Engine. This will make the Image ready to run. 
 
 ```bash
@@ -336,15 +341,15 @@ docker run --rm --network="bridge" --gpus all -e DISPLAY=:1 -v /tmp/.X11-unix:/t
 
 ```
 
-This will launch the simulation from the docker image using the environment defined in the Dockerfile recipe. Since we are running on a different machine that does not have the original MyRobotSimulation project, you will need to do one of two things:
+This will launch the simulation from the Docker Image using the environment defined in the Dockerfile recipe. Since we are running on a different machine that does not have the original MyRobotSimulation project, you will need to do one of two things:
 
-1. Copy the Examples/template folder to this machine
-2. Download it from the project template at https://github.com/o3de/o3de-extras/tree/d2888c1be6f339d323316f46633d46e35816864d/Templates/Ros2ProjectTemplate/Template/Examples and follow the instructions from the [previous blog](https://spham-amzn.github.io/posts/o3de-ros2-aws-mp-ami/) (Step 6: Setup and launch RViz).
+* Copy the Examples/template folder to this machine
+* Download it from the project template at https://github.com/o3de/o3de-extras/tree/d2888c1be6f339d323316f46633d46e35816864d/Templates/Ros2ProjectTemplate/Template/Examples and follow the instructions from the [previous blog](https://spham-amzn.github.io/posts/o3de-ros2-aws-mp-ami/) (Step 6: Setup and launch RViz).
 
 # Tearing Down
-Once we are done with distributing the simulation, we can remove it from Amazon ECR. The cost that Amazon ECR incurs is based on the storage that is used by the Docker Image ( $0.10 USD per GB/Month).  The image constructed with this blog takes up about 1.7 GB of storage, which translates to about $0.17 USD per month. To delete the ECR image, log back into your AWS console and navigate to the Amazon ECR dash board. Locate the `my_robot_simulation` under **Private registry**->**Repositories**. Select it and click the **Delete** button.
+Once we are done with distributing the simulation, we can remove it from Amazon ECR. The cost that Amazon ECR incurs is based on the storage that is used by the Docker Image ($0.10 USD per GB/Month).  The image constructed with this blog takes up about 1.7 GB of storage, which translates to about $0.17 USD per month. To delete the ECR image, log into your AWS console and navigate to the Amazon ECR dash board. Locate the `my_robot_simulation` under **Private registry**->**Repositories**. Select it and click the **Delete** button.
 
 # Conclusion
-In this blog we introduced a portable and consistent approach to distributing an O3DE simulation project to different machines. We took a sample robotic simulation project we created in a [previous blog](https://spham-amzn.github.io/posts/o3de-ros2-aws-mp-ami/) and exported the simulation as a separate package. We used this exported package to build an OCI compliant container image using Docker Engine and published it to a container registry using Amazon ECR. Finally we demonstrated how to pull and run the simulation docker image using Docker Engine and NVIDIA container toolkit.
+In this blog we introduced a portable and consistent approach to distributing an O3DE simulation project to different machines. We took a sample robotic simulation project we created in a [previous blog](https://spham-amzn.github.io/posts/o3de-ros2-aws-mp-ami/) and exported the simulation as a separate package. We used this exported package to build an OCI compliant container image using Docker Engine and published it to a container registry using Amazon ECR. Finally we demonstrated how to pull and run the simulation Docker Image using Docker Engine and NVIDIA container toolkit.
 
 
