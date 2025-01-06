@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Docker on Steve&#39;s O3DE Blog</title>
+    <link>http://localhost:1313/tags/docker/</link>
+    <description>Recent content in Docker on Steve&#39;s O3DE Blog</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 16 Dec 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/docker/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Distributing O3DE ROS2 simluations through Containers</title>
+      <link>http://localhost:1313/posts/o3de-ros2-containerize-simulation/</link>
+      <pubDate>Mon, 16 Dec 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/o3de-ros2-containerize-simulation/</guid>
+      <description>&lt;h1 id=&#34;distribute-robotic-simulations&#34;&gt;Distribute Robotic Simulations&lt;/h1&gt;&#xA;&lt;p&gt;For robotics simulation projects for ROS2 and O3DE, collaboration on constructing and refining the simulation can be shared across a team through source control such as GIT or Perforce. However, in order iterate through developing the simulation, O3DE, ROS2, and its environment and dependencies need to be installed separately in order to access and contribute to the project. I explained how Amazon&amp;rsquo;s EC2 helps with the environment through a marketplace AMI in my previous blog post.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
