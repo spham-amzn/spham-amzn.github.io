@@ -1,6 +1,6 @@
 +++
 title = "Running robotic simulations using Docker Images"
-draft = true
+draft = false
 date = "2024-12-16"
 description = ""
 tags = [
