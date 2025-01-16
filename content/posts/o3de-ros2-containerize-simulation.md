@@ -17,7 +17,7 @@ tags = [
 # Distributing Simulation Projects
 For robotics simulation projects using [ROS2](https://ros.org/) and [O3DE](https://o3de.org), collaboration on constructing and refining the simulation can be shared across a team through source control such as GIT or Perforce. However, in order to access, develop, and contribute to the simulation project, you need an environment that has O3DE, ROS2, and its dependencies installed and configured properly. The environment must also be consistent for every member of the team collaborating on the simulation. In my previous [blog post](https://spham-amzn.github.io/posts/o3de-ros2-aws-mp-ami/), I explained how Amazon's EC2 helps provide a pre-configured environment through an [AWS Marketplace](https://aws.amazon.com/marketplace) AMI. 
 
-The primary goal of simulations is for training robots through ROS2. The O3DE Editor is not needed to run the simulation, it can be launched through a separate launcher application. The same development environment is not be necessary either. Once the simulation project is ready for distribution, it can be exported into the launcher application separate from the O3DE Editor and build environment. Exporting a simulation project into its own launcher will package just the launcher executable and its bare minimum dependent binaries, assets, and necessary settings needed to launch the simulation. All the additional Editor and Asset Processor related binaries that comes with a full O3DE installation is omitted.
+The primary goal of simulations is for training robots through ROS2. The O3DE Editor is not needed to run the simulation, it can be launched through a separate launcher application. The same development environment is not necessary either. Once the simulation project is ready for distribution, it can be exported into the launcher application separate from the O3DE Editor and build environment. Exporting a simulation project into its own launcher will package just the launcher executable and its bare minimum dependent binaries, assets, and necessary settings needed to launch the simulation. All the additional Editor and Asset Processor related binaries that comes with a full O3DE installation is omitted.
 
 ### Containerization
 
@@ -46,18 +46,18 @@ This brings up the export settings specific to this project. Next, we configure 
 
 The export settings is designed for any type of project, not just simulations. There’re only a few settings needed to create our simulation launcher: 
 
-|  |  | |
-| ----- | ----- | ----- |
-| **Project Build Configuration**  | | profile |
-| **Build Assets** | | true |
-| **Level Names** | | DemoLevel |
-| **Max Size** | | 2048 |
-| **Asset Bundling Path** | | build/asset_bundling |
-| **Archive Format** | | none |
-| **Build Game Launcher** | | true |
-| **Build Server Launcher** | | false |
-| **Build Unified Launcher** | | false |
-| **Build Headless Server Launcher** | | false |
+|  |  |
+| ----- | ----- |
+| **Project Build Configuration**  | profile |
+| **Build Assets** | true |
+| **Level Names** | DemoLevel |
+| **Max Size** | 2048 |
+| **Asset Bundling Path** | build/asset_bundling |
+| **Archive Format** | none |
+| **Build Game Launcher** | true |
+| **Build Server Launcher** | false |
+| **Build Unified Launcher** | false |
+| **Build Headless Server Launcher** | false |
 
 Once the configuration is set, click on **Save** to save the settings. To run the project export, click on the context menu button for the project again, and click on **Export Launcher**->**Linux**
 
@@ -67,8 +67,6 @@ Once the configuration is set, click on **Save** to save the settings. To run th
 When the process is complete, the exported project will be located in a folder named **MyRobotSimulationGamePackage** in the path **~/O3DE/Projects/MyRobotSimulation/build/export/**
 
 # Creating a Docker Image
- The exported project can now be stored into a compressed archive and distributed to other Ubuntu 22.04 hosts to use. However, in order to run the project successfully, they must conform to the same general requirements for O3DE and ROS2. This means that the runtime environment must closely match the same environment as O3DE (minus the build tools). For this project to be portable and easy to distribute, we will use Containerization.
-
  The exported project can now be stored into a compressed archive and distributed to other Ubuntu 22.04 hosts to use. However, the exported project still requires the minimal environment and settings to run successfully and consistently.  We will create an OCI Complaint container Image for the environment and settings, and include the exported project and the sample navigation scripts for ROS and RViz. We will use [Docker Engine](https://www.docker.com/) in conjunction with the [NVIDIA Container toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker) to build and test the image.
 
 
